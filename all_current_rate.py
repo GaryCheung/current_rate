@@ -3,7 +3,7 @@ import requests
 import pymysql
 from datetime import datetime
 
-config = {
+config_currency = {
     'host':'127.0.0.1',
     'port':8889,
     'user':'root',
@@ -15,8 +15,8 @@ config = {
 
 present_date = datetime.now().date()
 
-def delete_today_data(config):
-    connection = pymysql.connect(**config)
+def delete_today_currency_data(config_currency):
+    connection = pymysql.connect(**config_currency)
     try:
         with connection.cursor() as cursor:
             # 执行sql语句，插入记录
@@ -28,7 +28,7 @@ def delete_today_data(config):
         connection.close()
     print('Executed on-----------',present_date,'\n','-----------------------delete success!----------------','\n')
 
-def get_boc_currency_data(config,source):
+def get_boc_currency_data(config_currency,source):
     url = 'http://www.boc.cn/sourcedb/whpj/'
     web_data = requests.get(url)
     soup = BeautifulSoup(web_data.text,'lxml')
@@ -46,8 +46,16 @@ def get_boc_currency_data(config,source):
         sell_xianhui = sell_xianhui.get_text()
         sell_xianchao = sell_xianchao.get_text()
         time = time.get_text()
+        if buy_xianchao == '':
+            buy_xianchao = '0.0'
+        if buy_xianhui == '':
+            buy_xianhui = '0.0'
+        if sell_xianchao == '':
+            sell_xianchao = '0.0'
+        if sell_xianhui == '':
+            sell_xianhui = '0.0'
         print('name',name,'--buy_xianhui',buy_xianhui,'---buy_xianchao',buy_xianchao,'---sell_xianchao',sell_xianchao,'---sell_xianhui',sell_xianhui,'---time',time)
-        connection = pymysql.connect(**config)
+        connection = pymysql.connect(**config_currency)
         try:
             with connection.cursor() as cursor:
                 # 执行sql语句，插入记录
@@ -58,7 +66,7 @@ def get_boc_currency_data(config,source):
         finally:
             connection.close()
 
-def get_cmb_currency_data(config,source):
+def get_cmb_currency_data(config_currency,source):
     url = 'http://fx.cmbchina.com/hq/'
     web_data = requests.get(url)
     soup = BeautifulSoup(web_data.text,'lxml')
@@ -77,8 +85,10 @@ def get_cmb_currency_data(config,source):
         sell_xianhui = sell_xianhui.get_text()
         sell_xianchao = sell_xianchao.get_text()
         time = time.get_text()
+        if name == '交易币':
+            continue
         print('---name',name,'--buy_xianhui',buy_xianhui,'---buy_xianchao',buy_xianchao,'---sell_xianchao',sell_xianchao,'---sell_xianhui',sell_xianhui,'---time',time)
-        connection = pymysql.connect(**config)
+        connection = pymysql.connect(**config_currency)
         try:
             with connection.cursor() as cursor:
                 # 执行sql语句，插入记录
@@ -92,6 +102,6 @@ def get_cmb_currency_data(config,source):
 
 
 source = ['boc','cmb']
-delete_today_data(config)
-get_boc_currency_data(config,source[0])
-get_cmb_currency_data(config,source[1])
+delete_today_currency_data(config_currency)
+get_boc_currency_data(config_currency,source[0])
+get_cmb_currency_data(config_currency,source[1])
