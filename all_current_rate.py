@@ -5,12 +5,11 @@ from datetime import datetime
 
 config_currency = {
     'host':'127.0.0.1',
-    'port':8889,
+    'port':3306,
     'user':'root',
-    'password':'root',
+    'password':'19860112',
     'db':'currency',
-    'charset':'utf8',
-    'unix_socket':'/Applications/MAMP/tmp/mysql/mysql.sock'
+    'charset':'utf8'
 }
 
 present_date = datetime.now().date()
@@ -84,7 +83,7 @@ def get_cmb_currency_data(config_currency,source):
         buy_xianchao = buy_xianchao.get_text()
         sell_xianhui = sell_xianhui.get_text()
         sell_xianchao = sell_xianchao.get_text()
-        time = time.get_text()
+        time = time.get_text().strip()
         if name == '交易币':
             continue
         print('---name',name,'--buy_xianhui',buy_xianhui,'---buy_xianchao',buy_xianchao,'---sell_xianchao',sell_xianchao,'---sell_xianhui',sell_xianhui,'---time',time)
